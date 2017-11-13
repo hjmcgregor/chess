@@ -217,9 +217,9 @@ class Q:
 				np = board.x[board.x.index(cx) - i] + str(cy + i)
 				if not board.is_occupied(np):
 					t.append(np)
-				elif board.is_occupied(np) and g == 0:
+				elif board.is_occupied(np) and h == 0:
 					t.append(np)
-					g = 1
+					h = 1
 
 		return t
 
