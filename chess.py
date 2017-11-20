@@ -4,6 +4,7 @@
 from pprint import pprint
 from datetime import datetime
 import copy
+import sys
 
 class Board:
 	"""The board Class"""
@@ -92,6 +93,7 @@ class Board:
 
 	def get_legal_moves(self, piece):
 		mv = piece.get_moves(board)
+		# pprint(self.positions)
 		lm = []
 		for m in mv:
 			nb = copy.deepcopy(self)
@@ -126,15 +128,23 @@ class Board:
 
 
 	def move(self, cp, np):
-		if self.positions[cp].c == self.turn and np in self.get_legal_moves(self.positions[cp]):
+		starttime = datetime.now()
+		if self.positions[cp] is not None and self.positions[cp].c == self.turn and np in self.get_legal_moves(self.positions[cp]):
 			self.update_board(self.positions[cp], np)
 			self.update_turn()
 			self.print_board()
+			if self.is_checkmate():
+				if self.turn == 'w':
+					print 'Checkmate, black wins'
+				else:
+					print 'Checkmate, white wines'
+				sys.exit()
 			print self.colors[self.turn] + ' to move'
 			self.get_move()
 		else:
 			print 'illegal move, ' + self.colors[self.turn] + ' to move'
 			self.get_move()
+		
 
 
 	def is_check(self):
@@ -142,7 +152,17 @@ class Board:
 
 
 	def is_checkmate(self):
-		pass
+		starttime = datetime.now()
+		lm = 0
+		for pos, p in self.positions.items():
+			if p is not None and p.c == self.turn:
+				m = self.get_legal_moves(p)
+				lm = lm + len(m)
+		print datetime.now() - starttime
+		if lm == 0:
+			return True
+		else:
+			return False
 
 
 	def update_turn(self):
@@ -152,8 +172,11 @@ class Board:
 			self.turn = 'w'
 
 
-
 	def get_move(self):
+		# print 'legal moves are: '
+		# for pos, p in self.positions.items():
+		# 	if p is not None and p.c == self.turn:
+		# 		print p.c, p.n, self.get_legal_moves(p)
 		m = raw_input(self.colors[self.turn] + ", enter your move: ")
 		cp = m[:2]
 		np = m[2:]
@@ -253,7 +276,7 @@ class B:
 					t.append(np)
 					b = 1
 			if board.x.index(cx) + i <= 7 and cy - i > 0:
-				np = board.x[board.x.index(cx) - i] + str(cy - i)
+				np = board.x[board.x.index(cx) + i] + str(cy - i)
 				if not board.is_occupied(np) and c == 0:
 					t.append(np)
 				elif board.is_occupied(np) and board.positions[np].c == self.c and c == 0 :
@@ -350,10 +373,10 @@ class Q:
 					t.append(np)
 					f = 1
 			if board.x.index(cx) + i <= 7 and cy - i > 0:
-				np = board.x[board.x.index(cx) - i] + str(cy - i)
+				np = board.x[board.x.index(cx) + i] + str(cy - i)
 				if not board.is_occupied(np) and g == 0:
 					t.append(np)
-				elif board.is_occupied(np) and board.positions[np].c == self.c and g == 0 :
+				elif board.is_occupied(np) and board.positions[np].c == self.c and g == 0:
 					g = 1
 				elif board.is_occupied(np) and board.positions[np].c != self.c and g == 0:
 					t.append(np)
@@ -362,7 +385,7 @@ class Q:
 				np = board.x[board.x.index(cx) - i] + str(cy + i)
 				if not board.is_occupied(np) and h == 0:
 					t.append(np)
-				elif board.is_occupied(np) and board.positions[np].c == self.c and h == 0 :
+				elif board.is_occupied(np) and board.positions[np].c == self.c and h == 0:
 					h = 1
 				elif board.is_occupied(np) and board.positions[np].c != self.c and h == 0:
 					t.append(np)
@@ -531,6 +554,8 @@ class p:
 # s = datetime.now()
 board = Board()
 board.set_standard()
+# board.positions['d8'] = Q('w')
+# board.positions['d1'] = Q('b')
 board.print_board()
 board.get_move()
 
