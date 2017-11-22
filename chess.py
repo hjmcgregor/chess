@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 from pprint import pprint
 from datetime import datetime
 import copy
 import sys
 
-class Board:
+
+class Board(object):
 	"""The board Class"""
 	def __init__(self, t='w'):
 		self.x = ['a','b','c','d','e','f','g','h']
@@ -17,6 +17,7 @@ class Board:
 		for n in self.x:
 			for i in self.y:
 				self.positions[n + str(i)] = None
+
 
 	def set_standard(self):
 		for n in self.x:
@@ -93,7 +94,6 @@ class Board:
 
 	def get_legal_moves(self, piece):
 		mv = piece.get_moves(board)
-		# pprint(self.positions)
 		lm = []
 		for m in mv:
 			nb = copy.deepcopy(self)
@@ -133,12 +133,15 @@ class Board:
 			self.update_board(self.positions[cp], np)
 			self.update_turn()
 			self.print_board()
-			if self.is_checkmate():
-				if self.turn == 'w':
-					print 'Checkmate, black wins'
+			if self.is_check():
+				if self.is_checkmate():
+					if self.turn == 'w':
+						print 'Checkmate, black wins'
+					else:
+						print 'Checkmate, white wines'
+					sys.exit()
 				else:
-					print 'Checkmate, white wines'
-				sys.exit()
+					print 'Check!'
 			print self.colors[self.turn] + ' to move'
 			self.get_move()
 		else:
@@ -146,9 +149,15 @@ class Board:
 			self.get_move()
 		
 
-
 	def is_check(self):
-		pass
+		starttime = datetime.now()
+		n = self.get_opp_moves(self.turn)
+		kp = self.find_king(self.turn)
+		print datetime.now() - starttime
+		if kp in n:
+			return True
+		else:
+			return False
 
 
 	def is_checkmate(self):
@@ -173,10 +182,6 @@ class Board:
 
 
 	def get_move(self):
-		# print 'legal moves are: '
-		# for pos, p in self.positions.items():
-		# 	if p is not None and p.c == self.turn:
-		# 		print p.c, p.n, self.get_legal_moves(p)
 		m = raw_input(self.colors[self.turn] + ", enter your move: ")
 		cp = m[:2]
 		np = m[2:]
@@ -187,7 +192,7 @@ class Board:
 			self.move(cp, np)
 
 
-class R:
+class R(object):
 	"""Rook"""
 	def __init__(self, color):
 		self.c = color
@@ -244,7 +249,7 @@ class R:
 		return board.find_piece(self)
 
 
-class B:
+class B(object):
 	"""Bishop"""
 	def __init__(self, color):
 		self.c = color
@@ -301,7 +306,7 @@ class B:
 		return board.find_piece(self)
 
 
-class Q:
+class Q(object):
 	"""Queen"""
 	def __init__(self, color):
 		self.c = color
@@ -398,7 +403,7 @@ class Q:
 		return board.find_piece(self)
 
 
-class N:
+class N(object):
 	"""Knight"""
 	def __init__(self, color):
 		self.c = color
@@ -449,7 +454,7 @@ class N:
 		return board.find_piece(self)
 
 
-class K:
+class K(object):
 	"""King"""
 	def __init__(self, color):
 		self.c = color
@@ -500,7 +505,7 @@ class K:
 		return board.find_piece(self)
 
 
-class p:
+class p(object):
 	"""Pawn"""
 	def __init__(self, color):
 		self.c = color
