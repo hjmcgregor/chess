@@ -88,6 +88,8 @@ class Board(object):
 
 
 	def update_board(self, piece, np):
+		# TODO: add current game's moves to an array
+		# also, maybe something for castling?
 		self.positions[piece.get_pos(board)] = None
 		self.positions[np] = piece
 
