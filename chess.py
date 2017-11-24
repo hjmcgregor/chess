@@ -19,6 +19,7 @@ class Board(object):
 				self.positions[n + str(i)] = None
 		self.log = []
 
+
 	def set_standard(self):
 		for n in self.x:
 			for i in self.y:
