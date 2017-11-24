@@ -19,7 +19,6 @@ class Board(object):
 				self.positions[n + str(i)] = None
 		self.log = []
 
-
 	def set_standard(self):
 		for n in self.x:
 			for i in self.y:
@@ -93,6 +92,8 @@ class Board(object):
 		# also, maybe something for castling?
 		self.positions[piece.get_pos(board)] = None
 		self.positions[np] = piece
+		if piece.n == 'R' or piece.n == 'K':
+			piece.num_moves += 1
 
 
 	def get_legal_moves(self, piece):
@@ -136,6 +137,7 @@ class Board(object):
 			self.update_board(self.positions[cp], np)
 			self.update_turn()
 			self.print_board()
+			print "castling: ", self.castling()
 			if self.is_check():
 				if self.is_checkmate():
 					if self.turn == 'w':
@@ -188,6 +190,7 @@ class Board(object):
 		m = raw_input(self.colors[self.turn] + ", enter your move: ")
 		cp = m[:2]
 		np = m[2:]
+		
 		if cp not in self.positions.keys() or np not in self.positions.keys():
 			print "Enter a valid move"
 			self.get_move()
@@ -195,11 +198,51 @@ class Board(object):
 			self.move(cp, np)
 
 
+	def castling(self):
+		"""Returns the castling ability as a fen string"""
+		fen = ""
+		wkr = self.positions['a8']
+		wk = self.positions['e1']
+		wqr = self.positions['a1']
+
+		bkr = self.positions['h8']
+		bk = self.positions['e8']
+		bqr = self.positions['a8']
+
+		# all of black's legal moves
+		wm = self.get_opp_moves('b')
+		bm = self.get_opp_moves('w')
+
+		# queenside positions which cannot be threatened
+		wqt = ['b1', 'c1', 'd1']
+		bqt = ['b8', 'c8', 'd8']
+
+		# kingside positions which cannot be threatened
+		wkt = ['f1', 'g1']
+		bkt = ['f8', 'g8']
+		if wkr is not None and wkr.c == 'w' and wkr.num_moves == 0 and wk.num_moves == 0:
+			# now make sure the position is not under fire
+			if not any(x in bm for x in wkt):
+				fen += "K"
+		if wqr is not None and wqr.c == 'w' and wqr.num_moves == 0 and wk.num_moves == 0:
+			if not any(x in bm for x in wqt):
+				fen += "Q"
+		if bkr is not None and bkr.c == 'b' and bkr.num_moves == 0 and bk.num_moves == 0:
+			if not any(x in wm for x in bkt):
+				fen += "k"
+		if bkr is not None and bkr.c == 'b' and bkr.num_moves == 0 and bk.num_moves == 0:
+			if not any(x in wm for x in bqt):
+				fen += "q"
+
+		return fen
+
 class R(object):
 	"""Rook"""
 	def __init__(self, color):
 		self.c = color
 		self.n = "R"
+		# for castling
+		self.num_moves = 0
 
 	def get_moves(self, board):
 		t = []
@@ -462,6 +505,8 @@ class K(object):
 	def __init__(self, color):
 		self.c = color
 		self.n = "K"
+		# for castling
+		self.num_moves = 0
 
 	def get_moves(self, board):
 		t = []
