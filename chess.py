@@ -5,8 +5,6 @@ from datetime import datetime
 import copy
 import sys
 
-#test
-#another test
 
 class Board(object):
 	"""The board Class"""
@@ -19,7 +17,7 @@ class Board(object):
 		for n in self.x:
 			for i in self.y:
 				self.positions[n + str(i)] = None
-
+		self.log = []
 
 	def set_standard(self):
 		for n in self.x:
