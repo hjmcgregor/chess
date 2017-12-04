@@ -16,7 +16,11 @@ def main():
 	# board.positions['g6'] = chess.N('w')
 	# board.positions['g8'] = chess.B('w')
 	# board.positions['f8'] = chess.K('b')
+<<<<<<< HEAD
 	# board.print_board()
+=======
+	board.print_board()
+>>>>>>> ac9f4fb879a8d0249ebee6b154bdd1f42c00858f
 
 	bm = get_bestmove(board.get_fen())
 	move(board, bm[:2], bm[2:4])
@@ -40,7 +44,11 @@ def move(board, cp, np):
 	starttime = datetime.now()
 	if board.positions[cp] is not None and board.positions[cp].c == board.turn and np in board.get_legal_moves(board.positions[cp]):
 		board.update_board(board.positions[cp], np)
+<<<<<<< HEAD
 		# board.print_board()
+=======
+		board.print_board()
+>>>>>>> ac9f4fb879a8d0249ebee6b154bdd1f42c00858f
 		board.update_turn()
 		if board.is_rep_draw(board.get_fen()):
 			print 'Draw- repeated moves!'
@@ -50,19 +58,30 @@ def move(board, cp, np):
 			sys.exit()
 		if board.is_check():
 			if board.is_checkmate():
+<<<<<<< HEAD
 				board.print_board()
+=======
+>>>>>>> ac9f4fb879a8d0249ebee6b154bdd1f42c00858f
 				if board.turn == 'w':
 					print 'Checkmate, black wins'
 				else:
 					print 'Checkmate, white wins'
 				sys.exit()
 			else:
+<<<<<<< HEAD
 				pass
 				# print 'Check!'
 		# print board.get_fen()
 		# print board.colors[board.turn] + ' to move'
 		bm = get_bestmove(board.get_fen())
 		# print '(best move via stockfish: ' + bm + ')'
+=======
+				print 'Check!'
+		print board.get_fen()
+		print board.colors[board.turn] + ' to move'
+		bm = get_bestmove(board.get_fen())
+		print '(best move via stockfish: ' + bm + ')'
+>>>>>>> ac9f4fb879a8d0249ebee6b154bdd1f42c00858f
 		move(board, bm[:2], bm[2:4])
 		# get_move(board)
 	else:
