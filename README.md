@@ -1,11 +1,11 @@
 # python chess
 A Python chess rules engine. The moves are determined using the Stockfish chess engine (https://stockfishchess.org/).
 
-usage: game.py [-h] [-bsl BSL] [-wsl WSL] [-w] [-b] [-p] [--hints]
+```usage: game.py [-h] [-bsl BSL] [-wsl WSL] [-w] [-b] [-p] [--hints]
 
 A python Chess rules framework, using the Stockfish chess engine.
 
-```optional arguments:
+optional arguments:
   -h, --help  show this help message and exit
   -bsl BSL    the skill level for Black (0 to 20). Default is 20
   -wsl WSL    the skill level for White (0 to 20). Default is 20
