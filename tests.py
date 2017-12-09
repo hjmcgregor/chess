@@ -4,7 +4,7 @@ from datetime import datetime
 import sys
 
 
-E = '../Stockfish/src/stockfish'
+E = 'stockfish-8-mac/Mac/stockfish-8-64'
 P = subprocess.Popen(E, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 def main():
@@ -17,12 +17,12 @@ def main():
 	# board.positions['g8'] = chess.B('w')
 	# board.positions['f8'] = chess.K('b')
 	# board.print_board()
-	board.print_board()
+	# board.print_board()
 
 	bm = get_bestmove(board.get_fen())
 	move(board, bm[:2], bm[2:4])
 	get_move(board)
-	
+	board.print_board()
 
 
 def get_move(board):
@@ -46,9 +46,11 @@ def move(board, cp, np):
 		board.update_turn()
 		if board.is_rep_draw(board.get_fen()):
 			print 'Draw- repeated moves!'
+			board.print_board()
 			sys.exit()
 		if board.is_stalemate():
 			print 'Draw- stalemate!'
+			board.print_board()
 			sys.exit()
 		if board.is_check():
 			if board.is_checkmate():
@@ -57,6 +59,7 @@ def move(board, cp, np):
 					print 'Checkmate, black wins'
 				else:
 					print 'Checkmate, white wins'
+				board.print_board()
 				sys.exit()
 			else:
 				pass
