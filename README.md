@@ -17,7 +17,7 @@ optional arguments:
   --hints     Turn on hints
 ```
 
-Example:
+Examples:
 
 Stockfish White (level 20) vs Stockfish Black (level 15), with printing on (only including the last printed board in this example):
 
@@ -47,6 +47,71 @@ Checkmate, white wins
 
 ```
 
-Rules Logic
+Playing as white vs. black computer (skill level 1), with hints included:
+```
+$ python game.py -bsl 1 -w --hints
+
+8  ♖   ♘   ♗   ♕   ♔   ♗   ♘   ♖  
+
+7  ♙   ♙   ♙   ♙   ♙   ♙   ♙   ♙  
+
+6  ·   ·   ·   ·   ·   ·   ·   ·  
+
+5  ·   ·   ·   ·   ·   ·   ·   ·  
+
+4  ·   ·   ·   ·   ·   ·   ·   ·  
+
+3  ·   ·   ·   ·   ·   ·   ·   ·  
+
+2  ♟   ♟   ♟   ♟   ♟   ♟   ♟   ♟  
+
+1  ♜   ♞   ♝   ♛   ♚   ♝   ♞   ♜  
+
+   a   b   c   d   e   f   g   h  
+
+(Best move via stockfish: d2d4)
+white, enter your move: d2d4
+8  ♖   ♘   ♗   ♕   ♔   ♗   ♘   ♖  
+
+7  ♙   ♙   ♙   ♙   ♙   ♙   ♙   ♙  
+
+6  ·   ·   ·   ·   ·   ·   ·   ·  
+
+5  ·   ·   ·   ·   ·   ·   ·   ·  
+
+4  ·   ·   ·   ♟   ·   ·   ·   ·  
+
+3  ·   ·   ·   ·   ·   ·   ·   ·  
+
+2  ♟   ♟   ♟   ·   ♟   ♟   ♟   ♟  
+
+1  ♜   ♞   ♝   ♛   ♚   ♝   ♞   ♜  
+
+   a   b   c   d   e   f   g   h  
+
+8  ♖   ♘   ♗   ♕   ♔   ♗   ♘   ♖  
+
+7  ♙   ♙   ♙   ·   ♙   ♙   ♙   ♙  
+
+6  ·   ·   ·   ♙   ·   ·   ·   ·  
+
+5  ·   ·   ·   ·   ·   ·   ·   ·  
+
+4  ·   ·   ·   ♟   ·   ·   ·   ·  
+
+3  ·   ·   ·   ·   ·   ·   ·   ·  
+
+2  ♟   ♟   ♟   ·   ♟   ♟   ♟   ♟  
+
+1  ♜   ♞   ♝   ♛   ♚   ♝   ♞   ♜  
+
+   a   b   c   d   e   f   g   h  
+
+(Best move via stockfish: e2e4)
+white, enter your move: 
+
+```
+
+# Rules Logic
 
 In order to determine a list of legal moves for a particular piece, we call the "get_moves" method of the particular piece object. We then whittle this down via the "get_legal_moves" method of the Board class, which accounts for castling, en passant, and pawn promotion logic. The "get_legal_moves" method also calls the "is_self_check" method of the board class, which projects a hypothetical move to determine if that would place the current player in self-check (which would be illegal). If that particular move is self check, it is removed from the list of legal moves.
