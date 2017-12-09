@@ -3,7 +3,7 @@
 from pprint import pprint
 from datetime import datetime
 import copy
-import sys
+
 
 
 class Board(object):
@@ -24,6 +24,9 @@ class Board(object):
 		# en passant
 		self.ep = '-'
 		self.log = []
+		# the fen array
+		self.fens = []
+
 
 	def set_standard(self):
 		for n in self.x:
@@ -90,10 +93,23 @@ class Board(object):
 		for pos, p in self.positions.items():
 			if p == piece:
 				return pos
-		return 0
+
+	def is_self_check(self, piece, np):
+		r = False
+		op = piece.get_pos(self)
+		tp = self.positions[np]
+		self.positions[op] = None
+		self.positions[np] = piece
+		if self.is_check():
+			r = True
+		self.positions[op] = piece
+		self.positions[np] = tp
+
+		return r
 
 
 	def update_board(self, piece, np):
+<<<<<<< HEAD
 		# TODO: add en passant logic
 		# TODO: add current game's moves to an array
 		# en_passant update
@@ -146,6 +162,19 @@ class Board(object):
 		# finally, update the board positions while accounting for castling
 		if piece.n == 'K':
 			if piece.num_moves == 0:
+=======
+		# TODO: clean up the en passant logic
+		# TODO: add current game's moves to PGN array
+
+		# !=0 here to avoid going through this if it is only for hypothetical purposes
+		if piece.get_pos(self) != 0:
+			self.update_ep(piece, np)
+			self.update_hm(piece, np)
+			self.update_fm(piece, np)
+
+			# finally, update the board positions while accounting for castling
+			if piece.n == 'K' and piece.num_moves == 0:
+>>>>>>> 73e9d1ff862fe96bc6e29498d73ecc2573ac12eb
 				# white kingside castle
 				if piece.get_pos(self) == 'e1' and np == 'g1':
 					self.positions[np] = piece
@@ -167,7 +196,11 @@ class Board(object):
 					self.positions['f8'] = self.positions['h8']
 					self.positions['e8'] = None
 					self.positions['h8'] = None
+<<<<<<< HEAD
 					self.positions['f1'].num_moves += 1
+=======
+					self.positions['f8'].num_moves += 1
+>>>>>>> 73e9d1ff862fe96bc6e29498d73ecc2573ac12eb
 				# black queenside castle
 				elif piece.get_pos(self) == 'e8' and np == 'c8':
 					self.positions[np] = piece
@@ -175,15 +208,34 @@ class Board(object):
 					self.positions['e8'] = None
 					self.positions['a8'] = None
 					self.positions['d8'].num_moves += 1
+<<<<<<< HEAD
 			piece.num_moves += 1
 		else:
 			self.positions[piece.get_pos(self)] = None
 			self.positions[np] = piece
+=======
+				else:
+					self.positions[piece.get_pos(self)] = None
+					self.positions[np] = piece
+				piece.num_moves += 1
+			# and queen promotion
+			elif piece.n == 'p' and (int(np[1]) == 8 or int(np[1]) == 1):
+				if piece.c == 'w':
+						self.positions[piece.get_pos(self)] = None
+						self.positions[np] = Q('w')
+				elif piece.c == 'b':
+						self.positions[piece.get_pos(self)] = None
+						self.positions[np] = Q('b')			
+			else:
+				self.positions[piece.get_pos(self)] = None
+				self.positions[np] = piece
+>>>>>>> 73e9d1ff862fe96bc6e29498d73ecc2573ac12eb
 
 
 	def get_legal_moves(self, piece):
 		# make a deep copy of each object here, so we don't update the board or the pieces with our hypothetical
 		# moves
+<<<<<<< HEAD
 		mv = piece.get_moves(board)
 		lm = []
 
@@ -199,6 +251,38 @@ class Board(object):
 			if kp not in opp_moves:
 				lm.append(m)
 
+=======
+		mv = piece.get_moves(self)
+		# print piece.get_pos(self), mv
+		lm = []
+
+		# this is to avoid self-check
+		for m in mv:
+			if not self.is_self_check(piece, m):
+				lm.append(m)
+			# nb = copy.deepcopy(self)
+			# np = copy.deepcopy(piece)
+			# # print np
+			# nb.update_board(np, m)
+		
+			# find your own King's position first
+			# kp = nb.find_king(np.c)
+			# kp = self.find_king(piece.c)
+
+			# now if your King's position appears in the opponent's possible moves, it is self check
+			# opp_moves = []
+			# opp_moves = self.get_opp_moves(piece.c)
+			# print "opp moves: ", opp_moves
+
+			# if piece.n != 'K' and kp not in opp_moves:
+			# 	lm.append(m)
+			# elif np.n == 'K' and m not in opp_moves:
+			# 	lm.append(m)
+
+			# del nb
+			# del np
+			# print piece.n, lm, "opp_moves: ", opp_moves
+>>>>>>> 73e9d1ff862fe96bc6e29498d73ecc2573ac12eb
 		# now append squares for castling, while accounting for positions that are threatened
 		if piece.n == 'K':
 			cur_cas = self.castling()
@@ -232,8 +316,13 @@ class Board(object):
 							lm.append('c8')
 
 		if piece.n == 'p':
+<<<<<<< HEAD
 			# if the en-passant attribute is in an adjacent rank, it is a legal move
 			if piece.c == 'w' and piece.get_pos(self)[1] == 5:
+=======
+			# if the en-passant attribute is in an adjacent file, it is a legal move
+			if piece.c == 'w' and int(piece.get_pos(self)[1]) == 5:
+>>>>>>> 73e9d1ff862fe96bc6e29498d73ecc2573ac12eb
 				if piece.get_pos(self)[0] == 'a' and self.ep == 'b6':
 					lm.append(self.ep)
 				if piece.get_pos(self)[0] == 'b' and (self.ep == 'a6' or self.ep == 'c6'):
@@ -250,7 +339,11 @@ class Board(object):
 					lm.append(self.ep)
 				if piece.get_pos(self)[0] == 'h' and self.ep == 'g6':
 					lm.append(self.ep)
+<<<<<<< HEAD
 			if piece.c == 'b' and piece.get_pos(self)[1] == 4:
+=======
+			if piece.c == 'b' and int(piece.get_pos(self)[1]) == 4:
+>>>>>>> 73e9d1ff862fe96bc6e29498d73ecc2573ac12eb
 				if piece.get_pos(self)[0] == 'a' and self.ep == 'b3':
 					lm.append(self.ep)
 				if piece.get_pos(self)[0] == 'b' and (self.ep == 'a3' or self.ep == 'c3'):
@@ -267,11 +360,110 @@ class Board(object):
 					lm.append(self.ep)
 				if piece.get_pos(self)[0] == 'h' and self.ep == 'g3':
 					lm.append(self.ep)
+<<<<<<< HEAD
 
 
 
 
+=======
+		# print piece.get_pos(self), lm
+>>>>>>> 73e9d1ff862fe96bc6e29498d73ecc2573ac12eb
 		return lm
+
+
+	def update_hm(self, piece, np):
+		# update the halfmove clock
+		if piece.n == 'p' or self.positions[np] != None:
+			self.hm = 0
+		else:
+			self.hm += 1
+
+
+	def update_fm(self, piece, np):
+		# and the fullmove clock
+		if self.turn == 'b':
+			self.fm += 1
+
+
+	def update_ep(self, piece, np):
+		# update the fen en passant string
+		if piece.n == 'p':
+			if piece.c == 'b' and (int(piece.get_pos(self)[1]) - int(np[1])) == 2:
+				if np[0] == 'a':
+					if self.positions['b5'] is not None and self.positions['b5'].n == 'p' and self.positions['b5'].c == 'w':
+						self.ep = 'a6'
+				elif np[0] == 'b':
+					if self.positions['a5'] is not None and self.positions['a5'].n == 'p' and self.positions['a5'].c == 'w':
+						self.ep = 'b6'
+					if self.positions['c5'] is not None and self.positions['c5'].n == 'p' and self.positions['c5'].c == 'w':
+						self.ep = 'b6'
+				elif np[0] == 'c':
+					if self.positions['b5'] is not None and self.positions['b5'].n == 'p' and self.positions['b5'].c == 'w':
+						self.ep = 'c6'
+					if self.positions['d5'] is not None and self.positions['d5'].n == 'p' and self.positions['d5'].c == 'w':
+						self.ep = 'c6'
+				elif np[0] == 'd':
+					if self.positions['c5'] is not None and self.positions['c5'].n == 'p' and self.positions['c5'].c == 'w':
+						self.ep = 'd6'
+					if self.positions['e5'] is not None and self.positions['e5'].n == 'p' and self.positions['e5'].c == 'w':
+						self.ep = 'd6'
+				elif np[0] == 'e':
+					if self.positions['d5'] is not None and self.positions['d5'].n == 'p' and self.positions['d5'].c == 'w':
+						self.ep = 'e6'
+					if self.positions['f5'] is not None and self.positions['f5'].n == 'p' and self.positions['f5'].c == 'w':
+						self.ep = 'e6'
+				elif np[0] == 'f':
+					if self.positions['e5'] is not None and self.positions['e5'].n == 'p' and self.positions['e5'].c == 'w':
+						self.ep = 'f6'
+					if self.positions['g5'] is not None and self.positions['g5'].n == 'p' and self.positions['g5'].c == 'w':
+						self.ep = 'f6'
+				elif np[0] == 'g':
+					if self.positions['f5'] is not None and self.positions['f5'].n == 'p' and self.positions['f5'].c == 'w':
+						self.ep = 'g6'
+					if self.positions['f5'] is not None and self.positions['f5'].n == 'p' and self.positions['f5'].c == 'w':
+						self.ep = 'g6'
+				elif np[0] == 'h':
+					if self.positions['g5'] is not None and self.positions['g5'].n == 'p' and self.positions['g5'].c == 'w':
+						self.ep = 'h6'
+			elif piece.c == 'w' and (int(np[1]) - int(piece.get_pos(self)[1])) == 2:
+				if np[0] == 'a':
+					if self.positions['b4'] is not None and self.positions['b4'].n == 'p' and self.positions['b4'].c == 'b':
+						self.ep = 'a3'
+				elif np[0] == 'b':
+					if self.positions['a4'] is not None and self.positions['a4'].n == 'p' and self.positions['a4'].c == 'b':
+						self.ep = 'b3'
+					if self.positions['c4'] is not None and self.positions['c4'].n == 'p' and self.positions['c4'].c == 'b':
+						self.ep = 'b3'
+				elif np[0] == 'c':
+					if self.positions['b4'] is not None and self.positions['b4'].n == 'p' and self.positions['b4'].c == 'b':
+						self.ep = 'c3'
+					if self.positions['d4'] is not None and self.positions['d4'].n == 'p' and self.positions['d4'].c == 'b':
+						self.ep = 'c3'
+				elif np[0] == 'd':
+					if self.positions['c4'] is not None and self.positions['c4'].n == 'p' and self.positions['c4'].c == 'b':
+						self.ep = 'd3'
+					if self.positions['e4'] is not None and self.positions['e4'].n == 'p' and self.positions['e4'].c == 'b':
+						self.ep = 'd3'
+				elif np[0] == 'e':
+					if self.positions['d4'] is not None and self.positions['d4'].n == 'p' and self.positions['d4'].c == 'b':
+						self.ep = 'e3'
+					if self.positions['f4'] is not None and self.positions['f4'].n == 'p' and self.positions['f4'].c == 'b':
+						self.ep = 'e3'
+				elif np[0] == 'f':
+					if self.positions['e4'] is not None and self.positions['e4'].n == 'p' and self.positions['e4'].c == 'b':
+						self.ep = 'f3'
+					if self.positions['g4'] is not None and self.positions['g4'].n == 'p' and self.positions['g4'].c == 'b':
+						self.ep = 'f3'
+				elif np[0] == 'g':
+					if self.positions['f4'] is not None and self.positions['f4'].n == 'p' and self.positions['f4'].c == 'b':
+						self.ep = 'g3'
+					if self.positions['f4'] is not None and self.positions['f4'].n == 'p' and self.positions['f4'].c == 'b':
+						self.ep = 'g3'
+				elif np[0] == 'h':
+					if self.positions['g4'] is not None and self.positions['g4'].n == 'p' and self.positions['g4'].c == 'b':
+						self.ep = 'h3'
+		else:
+			self.ep = '-'
 
 
 	def print_board(self):
@@ -294,6 +486,7 @@ class Board(object):
 		print "\n"
 
 
+<<<<<<< HEAD
 	def move(self, cp, np):
 		starttime = datetime.now()
 		if self.positions[cp] is not None and self.positions[cp].c == self.turn and np in self.get_legal_moves(self.positions[cp]):
@@ -312,16 +505,58 @@ class Board(object):
 					print 'Check!'
 			print self.colors[self.turn] + ' to move'
 			self.get_move()
+=======
+	def is_rep_draw(self, fen):
+		self.fens.append(fen.split(' ')[0] + fen.split(' ')[2] + fen.split(' ')[3])
+		if self.fens.count(fen.split(' ')[0] + fen.split(' ')[2] + fen.split(' ')[3]) > 2:
+			return True
+>>>>>>> 73e9d1ff862fe96bc6e29498d73ecc2573ac12eb
 		else:
-			print 'illegal move, ' + self.colors[self.turn] + ' to move'
-			self.get_move()
-		
+			return False
+
+
+	def is_stalemate(self):
+		# stalemate conditions, as per http://www.e4ec.org/immr.html
+		# get all of each color's pieces
+		p = {'w': [], 'b': []}
+		for pos, piece in self.positions.items():
+			if piece is not None:
+				if piece.c == 'w':
+					p['w'].append(piece)
+				else:
+					p['b'].append(piece)
+
+		# K v K stalemate
+		if len(p['w']) == 1 and len(p['b']) == 1:
+			if p['w'][0].n == 'K' and p['b'][0].n == 'K':
+				return True
+
+		# if there are no legal moves, but are not in check
+		lm = 0
+		for piece in p[self.turn]:
+			lm += len(self.get_legal_moves(piece))
+		if lm == 0 and not self.is_check():
+			return True
+
+		# bishop & king vs. king, knight & king vs. king
+		# we'll ignore the situation for now where a player promotes to a same-color bishop
+		if len(p['w']) == 1 and len(p['b']) == 2:
+			if p['w'][0].n == 'K':
+				if (p['b'][0].n == 'K' and p['b'][1].n == 'B') or (p['b'][0].n == 'B' and p['b'][1].n == 'K'):
+					return True
+				elif (p['b'][0].n == 'K' and p['b'][1].n == 'N') or (p['b'][0].n == 'N' and p['b'][1].n == 'K'):
+					return True
+		if len(p['w']) == 2 and len(p['b']) == 1:
+			if p['b'][0].n == 'K':
+				if (p['w'][0].n == 'K' and p['w'][1].n == 'B') or (p['w'][0].n == 'B' and p['w'][1].n == 'K'):
+					return True
+				if (p['w'][0].n == 'K' and p['w'][1].n == 'N') or (p['w'][0].n == 'N' and p['w'][1].n == 'K'):
+					return True
+
 
 	def is_check(self):
-		starttime = datetime.now()
 		n = self.get_opp_moves(self.turn)
 		kp = self.find_king(self.turn)
-		print datetime.now() - starttime
 		if kp in n:
 			return True
 		else:
@@ -329,13 +564,11 @@ class Board(object):
 
 
 	def is_checkmate(self):
-		starttime = datetime.now()
 		lm = 0
 		for pos, p in self.positions.items():
 			if p is not None and p.c == self.turn:
 				m = self.get_legal_moves(p)
 				lm = lm + len(m)
-		print datetime.now() - starttime
 		if lm == 0:
 			return True
 		else:
@@ -349,6 +582,7 @@ class Board(object):
 			self.turn = 'w'
 
 
+<<<<<<< HEAD
 	def get_move(self):
 		m = raw_input(self.colors[self.turn] + ", enter your move: ")
 		cp = m[:2]
@@ -359,6 +593,71 @@ class Board(object):
 			self.get_move()
 		else:
 			self.move(cp, np)
+=======
+	def castling(self):
+		"""Returns the castling ability as a fen string"""
+		fen = ""
+		wkr = self.positions['h1']
+		wk = self.positions['e1']
+		wqr = self.positions['a1']
+
+		bkr = self.positions['h8']
+		bk = self.positions['e8']
+		bqr = self.positions['a8']
+
+		if wkr is not None and wk is not None:
+			if wkr.c == 'w' and wkr.n == 'R' and wk.c == 'w' and wk.n == 'K':
+				if wkr.num_moves == 0 and wk.num_moves == 0:
+					fen += "K"
+		if wqr is not None and wk is not None:
+			if wqr.c == 'w' and wqr.n == 'R' and wk.c == 'w' and wk.n == 'K':
+				if wqr.num_moves == 0 and wk.num_moves == 0:
+					fen += "Q"
+		if bkr is not None and bk is not None:
+			if bkr.c == 'b' and bkr.n == 'R' and bk.c == 'b' and bk.n == 'K':
+				if bkr.num_moves == 0 and bk.num_moves == 0:
+					fen += "k"
+		if bqr is not None and bk is not None:
+			if bqr.c == 'b' and bqr.n == 'R' and bk.c == 'b' and bk.n == 'K':
+				if bqr.num_moves == 0 and bk.num_moves == 0:
+					fen += "q"
+
+		if len(fen) == 0:
+			fen = "-"
+
+		return fen
+
+
+	def get_fen(self):
+		fen = ""
+		yr = [i for i in range(8,0,-1)]
+		
+		for i in yr:
+			c = 0
+			for n in self.x:
+				if self.positions[n + str(i)] is not None:
+					if c > 0:
+						fen += str(c)
+						c = 0
+					if self.positions[n + str(i)].c == 'w':
+						fen += self.positions[n + str(i)].n.upper()
+					else:
+						fen += self.positions[n + str(i)].n.lower()
+				else:
+					c += 1
+				if self.x.index(n) == 7 and c > 0:
+					fen += str(c)
+			if i > 0:
+				fen += "/"
+		fen += " " + self.turn
+		fen += " " + self.castling()
+		fen += " " + self.ep
+		fen += " " + str(self.hm)
+		fen += " " + str(self.fm)
+
+		return fen
+
+>>>>>>> 73e9d1ff862fe96bc6e29498d73ecc2573ac12eb
 
 
 	def castling(self):
@@ -757,7 +1056,7 @@ class p(object):
 		if self.c == 'w':
 			if cy == 2:
 				np = board.x[board.x.index(cx)] + str(cy + 2)
-				if not board.is_occupied(np):
+				if not board.is_occupied(board.x[board.x.index(cx)] + str(cy + 1)) and not board.is_occupied(np):
 					t.append(np)
 			if cy + 1 < 9:
 				np = board.x[board.x.index(cx)] + str(cy + 1)
@@ -774,7 +1073,7 @@ class p(object):
 		else:
 			if cy == 7:
 				np = board.x[board.x.index(cx)] + str(cy - 2)
-				if not board.is_occupied(np):
+				if not board.is_occupied(board.x[board.x.index(cx)] + str(cy - 1)) and not board.is_occupied(np):
 					t.append(np)
 			if cy - 1 > 0:
 				np = board.x[board.x.index(cx)] + str(cy - 1)
@@ -794,12 +1093,8 @@ class p(object):
 	def get_pos(self, board):
 		return board.find_pos(self)
 
-# s = datetime.now()
-board = Board()
-board.set_standard()
-# board.positions['d8'] = Q('w')
-# board.positions['d1'] = Q('b')
-board.print_board()
-board.get_move()
 
+<<<<<<< HEAD
 # print datetime.now() - s
+=======
+>>>>>>> 73e9d1ff862fe96bc6e29498d73ecc2573ac12eb
