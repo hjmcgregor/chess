@@ -45,10 +45,11 @@ class Game(object):
 
 
 	def get_move(self, board):
+		if self.hints:
+			print "(Best move via stockfish: " + self.get_bestmove(board.get_fen(), board.turn) + ")"
 		m = raw_input(board.colors[board.turn] + ", enter your move: ")
 		cp = m[:2]
 		np = m[2:]
-		
 		if cp not in board.positions.keys() or np not in board.positions.keys():
 			print "Enter a valid move"
 			self.get_move(board)
