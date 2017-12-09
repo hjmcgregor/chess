@@ -1,5 +1,5 @@
 # python chess
-A Python chess rules engine. The moves are determined using the Stockfish chess engine (https://stockfishchess.org/).
+A Python chess rules engine. Computer moves are determined using the Stockfish chess engine (https://stockfishchess.org/).
 ```
 usage: game.py [-h] [-bsl BSL] [-wsl WSL] [-w] [-b] [-p] [--hints]
 
