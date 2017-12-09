@@ -22,7 +22,7 @@ Example:
 Stockfish White (level 20) vs Stockfish Black (level 15), with printing on (only including the last printed board in this example):
 
 ```
-python game.py -bsl 15 -p
+$ python game.py -bsl 15 -p
 
 ...
 
