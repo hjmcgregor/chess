@@ -21,7 +21,7 @@ Example:
 
 Stockfish White (level 20) vs Stockfish Black (level 15):
 
-'''
+```
 python game.py -bsl 15 -p
 
 ...
