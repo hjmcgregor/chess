@@ -1,9 +1,12 @@
 # python chess
-A Python chess rules engine. Computer moves are determined using the Stockfish chess engine (https://stockfishchess.org/).
-```
-usage: game.py [-h] [-bsl BSL] [-wsl WSL] [-w] [-b] [-p] [--hints]
+A Python chess rules engine. Computer moves are determined using the Stockfish chess engine (https://stockfishchess.org/). You must pass the location of your stockfish engine via positional argument (examples below).
 
+
+```
 A python Chess rules framework, using the Stockfish chess engine.
+
+positional arguments:
+  E           Stockfish Engine location
 
 optional arguments:
   -h, --help  show this help message and exit
@@ -22,7 +25,7 @@ Examples:
 Stockfish White (level 20) vs Stockfish Black (level 15), with printing on (only including the last printed board in this example):
 
 ```
-$ python game.py -bsl 15 -p
+$ python game.py 'stockfish-8-mac/Mac/stockfish-8-64' -bsl 15 -p
 
 ...
 
@@ -49,7 +52,7 @@ Checkmate, white wins
 
 Playing as white vs. black computer (skill level 1), with hints included:
 ```
-$ python game.py -bsl 1 -w --hints
+$ python game.py 'stockfish-8-mac/Mac/stockfish-8-64' -bsl 1 -w --hints
 
 8  ♜   ♞   ♝   ♛   ♚   ♝   ♞   ♜  
 

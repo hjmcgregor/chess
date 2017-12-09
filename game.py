@@ -5,12 +5,10 @@ import sys
 import argparse
 
 
-E = 'stockfish-8-mac/Mac/stockfish-8-64'
-P = subprocess.Popen(E, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
 def main():
 	parser = argparse.ArgumentParser(description='A python Chess rules framework, using the Stockfish chess engine.')
-
+	parser.add_argument('e', metavar='E', type=str,
+                    help='Stockfish Engine location')
 	parser.add_argument('-bsl', default=20, help='the skill level for Black (0 to 20). Default is 20')
 	parser.add_argument('-wsl', default=20, help='the skill level for White (0 to 20). Default is 20')
 	parser.add_argument('-w', action='store_true', help='White user. Default is computer. Include this if you want a human to make moves for white.')
@@ -33,6 +31,8 @@ def main():
 class Game(object):
 	def __init__(self, args):
 		# each color's skill level
+		self.E = args.e
+		self.P = subprocess.Popen(self.E, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		self.bsl = args.bsl
 		self.wsl = args.wsl
 		self.white = args.w
@@ -103,10 +103,10 @@ class Game(object):
 			sl = self.wsl
 		else:
 			sl = self.bsl
-		P.stdin.write("setoption name Skill Level value " + str(sl) + "\n")
-		P.stdin.write("position fen " + fen + "\n")
-		P.stdin.write("go\n")
-		for e in iter(P.stdout.readline, ' '):
+		self.P.stdin.write("setoption name Skill Level value " + str(sl) + "\n")
+		self.P.stdin.write("position fen " + fen + "\n")
+		self.P.stdin.write("go\n")
+		for e in iter(self.P.stdout.readline, ' '):
 			if 'bestmove' in e:
 				return e.split(' ')[1].rstrip()
 
