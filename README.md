@@ -17,6 +17,36 @@ optional arguments:
   --hints     Turn on hints
 ```
 
-In order to determine a list of legal moves for a particular piece, we call the "get_moves" method of the particular piece class. We then whittle this down via the "get_legal_moves" method of the Board class, which accounts for castling, en passant, and pawn promotion logic. The "get_legal_moves" method also calls the "is_self_check" method of the board class, which projects a hypothetical move to determine if that would place the current player in self-check (which would be illegal). If that particular move is self check, it is removed from the list of legal moves.
-#TODO- clean up the "is_self_check" method, which I believe generally slows everything down.
+Example:
 
+Stockfish White (level 20) vs Stockfish Black (level 15):
+
+'''
+python game.py -bsl 15 -p
+
+...
+
+Checkmate, white wins
+8  ·   ·   ·   ·   ·   ♔   ·   ♛  
+
+7  ·   ·   ·   ·   ·   ·   ·   ·  
+
+6  ·   ·   ·   ♚   ♝   ·   ♟   ·  
+
+5  ·   ·   ·   ·   ·   ·   ·   ·  
+
+4  ·   ·   ·   ·   ·   ·   ·   ·  
+
+3  ·   ·   ·   ·   ·   ·   ·   ·  
+
+2  ·   ·   ·   ·   ·   ·   ·   ·  
+
+1  ·   ·   ·   ·   ·   ·   ·   ·  
+
+   a   b   c   d   e   f   g   h 
+
+```
+
+Rules Logic
+
+In order to determine a list of legal moves for a particular piece, we call the "get_moves" method of the particular piece object. We then whittle this down via the "get_legal_moves" method of the Board class, which accounts for castling, en passant, and pawn promotion logic. The "get_legal_moves" method also calls the "is_self_check" method of the board class, which projects a hypothetical move to determine if that would place the current player in self-check (which would be illegal). If that particular move is self check, it is removed from the list of legal moves.
