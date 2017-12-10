@@ -116,7 +116,6 @@ class Board(object):
 
 	def update_board(self, piece, np):
 		# TODO: clean up the en passant logic
-		# TODO: add current game's moves to PGN array
 		cp = piece.get_pos(self)
 
 		self.update_ep(piece, np)
