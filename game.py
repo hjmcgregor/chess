@@ -30,7 +30,6 @@ def main():
 
 class Game(object):
 	def __init__(self, args):
-		# each color's skill level
 		self.E = args.e
 		self.P = subprocess.Popen(self.E, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		self.bsl = args.bsl
@@ -61,37 +60,35 @@ class Game(object):
 		starttime = datetime.now()
 		if board.positions[cp] is not None and board.positions[cp].c == board.turn and np in board.get_legal_moves(board.positions[cp]):
 			board.update_board(board.positions[cp], np)
-			# board.print_board()
+			board.update_turn()
 			if self.p:
 				board.print_board()
-			board.update_turn()
 			if board.is_rep_draw(board.get_fen()):
 				print 'Draw- repeated moves!'
-				board.print_board()
-				sys.exit()
+				self.end_game(board)
 			if board.is_stalemate():
 				print 'Draw- stalemate!'
-				board.print_board()
-				sys.exit()
+				self.end_game(board)
 			if board.is_check():
 				if board.is_checkmate():
-					board.print_board()
 					if board.turn == 'w':
 						print 'Checkmate, black wins'
 					else:
 						print 'Checkmate, white wins'
-					board.print_board()
-					sys.exit()
-				else:
-					if self.p:
-						print 'Check!'
-			# print board.get_fen()
-			# print board.colors[board.turn] + ' to move'
+					board.pgnm += '#'
+					self.end_game(board)
+				if self.p:
+					print 'Check!'
+				# update the board's pgn move string here, so we only have to loop through the 
+				# is_check method once
+				board.pgnm += '+'
+				# board.update_pgn()
 			if (self.white and board.turn == 'w') or (self.black and board.turn == 'b'):
 				self.get_move(board)
 			else:
+				board.update_pgn()
 				bm = self.get_bestmove(board.get_fen(), board.turn)
-			self.move(board, bm[:2], bm[2:4])
+				self.move(board, bm[:2], bm[2:4])
 			# get_move(board)
 		else:
 			print 'illegal move, ' + board.colors[board.turn] + ' to move'
@@ -111,6 +108,13 @@ class Game(object):
 				return e.split(' ')[1].rstrip()
 
 		return 0
+
+
+	def end_game(self, board):
+		board.update_pgn()
+		board.print_board()
+		board.print_pgn()
+		sys.exit()
 
 
 if __name__ == "__main__":

@@ -20,12 +20,19 @@ class Board(object):
 		# halfmove number
 		self.hm = 0
 		# fullmove number
-		self.fm = 1
+		self.fm = 0
+		# all moves- for PGN updates
+		self.am = 1
 		# en passant
 		self.ep = '-'
-		self.log = []
 		# the fen array
 		self.fens = []
+		# the PGN array
+		# the second PGN array is the 'half-move' array- we reset it after every full turn (white & black)
+		# the third is a pgn string for a particular move
+		self.pgn = []
+		self.pgnh = []
+		self.pgnm = ''
 
 
 	def set_standard(self):
@@ -94,6 +101,7 @@ class Board(object):
 			if p == piece:
 				return pos
 
+
 	def is_self_check(self, piece, np):
 		r = False
 		op = piece.get_pos(self)
@@ -111,63 +119,82 @@ class Board(object):
 	def update_board(self, piece, np):
 		# TODO: clean up the en passant logic
 		# TODO: add current game's moves to PGN array
-
-		# !=0 here to avoid going through this if it is only for hypothetical purposes
-		if piece.get_pos(self) != 0:
-			self.update_ep(piece, np)
-			self.update_hm(piece, np)
-			self.update_fm(piece, np)
-
-			# finally, update the board positions while accounting for castling
-			if piece.n == 'K' and piece.num_moves == 0:
-				# white kingside castle
-				if piece.get_pos(self) == 'e1' and np == 'g1':
-					self.positions[np] = piece
-					self.positions['f1'] = self.positions['h1']
-					self.positions['e1'] = None
-					self.positions['h1'] = None
-					# update the Rook's num_moves, since only the King's will get updated in this method
-					self.positions['f1'].num_moves += 1
-				# white queenside castle
-				elif piece.get_pos(self) == 'e1' and np == 'c1':
-					self.positions[np] = piece
-					self.positions['d1'] = self.positions['a1']
-					self.positions['e1'] = None
-					self.positions['a1'] = None
-					self.positions['d1'].num_moves += 1
-				# black kingside castle
-				elif piece.get_pos(self) == 'e8' and np == 'g8':
-					self.positions[np] = piece
-					self.positions['f8'] = self.positions['h8']
-					self.positions['e8'] = None
-					self.positions['h8'] = None
-					self.positions['f8'].num_moves += 1
-				# black queenside castle
-				elif piece.get_pos(self) == 'e8' and np == 'c8':
-					self.positions[np] = piece
-					self.positions['d8'] = self.positions['a8']
-					self.positions['e8'] = None
-					self.positions['a8'] = None
-					self.positions['d8'].num_moves += 1
-				else:
-					self.positions[piece.get_pos(self)] = None
-					self.positions[np] = piece
-				piece.num_moves += 1
-			# and queen promotion
-			elif piece.n == 'p' and (int(np[1]) == 8 or int(np[1]) == 1):
-				if piece.c == 'w':
-						self.positions[piece.get_pos(self)] = None
-						self.positions[np] = Q('w')
-				elif piece.c == 'b':
-						self.positions[piece.get_pos(self)] = None
-						self.positions[np] = Q('b')			
+		self.update_ep(piece, np)
+		self.update_hm(piece, np)
+		self.update_fm(piece, np)
+		self.am += 1
+		# finally, update the board positions while accounting for castling
+		if piece.n == 'K' and piece.num_moves == 0:
+			# white kingside castle
+			if piece.get_pos(self) == 'e1' and np == 'g1':
+				self.positions[np] = piece
+				self.positions['f1'] = self.positions['h1']
+				self.positions['e1'] = None
+				self.positions['h1'] = None
+				# update the Rook's num_moves, since only the King's will get updated in this method
+				self.positions['f1'].num_moves += 1
+				self.pgnm = 'O-O'
+			# white queenside castle
+			elif piece.get_pos(self) == 'e1' and np == 'c1':
+				self.positions[np] = piece
+				self.positions['d1'] = self.positions['a1']
+				self.positions['e1'] = None
+				self.positions['a1'] = None
+				self.positions['d1'].num_moves += 1
+				self.pgnm = 'O-O-O'
+			# black kingside castle
+			elif piece.get_pos(self) == 'e8' and np == 'g8':
+				self.positions[np] = piece
+				self.positions['f8'] = self.positions['h8']
+				self.positions['e8'] = None
+				self.positions['h8'] = None
+				self.positions['f8'].num_moves += 1
+				self.pgnm = 'O-O'
+			# black queenside castle
+			elif piece.get_pos(self) == 'e8' and np == 'c8':
+				self.positions[np] = piece
+				self.positions['d8'] = self.positions['a8']
+				self.positions['e8'] = None
+				self.positions['a8'] = None
+				self.positions['d8'].num_moves += 1
+				self.pgnm = 'O-O-O'
 			else:
+				if self.is_occupied(np):
+					self.pgnm = piece.n + 'x' + np
+				else:
+					self.pgnm = piece.n + np
 				self.positions[piece.get_pos(self)] = None
 				self.positions[np] = piece
+			piece.num_moves += 1
+		# and queen promotion
+		elif piece.n == 'p':
+			if int(np[1]) == 8 or int(np[1]) == 1:
+				if piece.c == 'w':
+					self.positions[piece.get_pos(self)] = None
+					self.positions[np] = Q('w')
+				elif piece.c == 'b':
+					self.positions[piece.get_pos(self)] = None
+					self.positions[np] = Q('b')
+				self.pgnm = np + "=Q"
+			else:
+				# update the PGN
+				if self.is_occupied(np):
+					self.pgnm = piece.get_pos(self)[0] + 'x' + np
+				else:
+					self.pgnm = np	
+				self.positions[piece.get_pos(self)] = None
+				self.positions[np] = piece
+		else:
+			if self.is_occupied(np):
+				self.pgnm = piece.n + piece.get_pos(self)[0] + 'x' + np
+			else:
+				self.pgnm = piece.n + piece.get_pos(self)[0] + np
+			self.positions[piece.get_pos(self)] = None
+			self.positions[np] = piece
+		# self.update_pgn()
 
 
 	def get_legal_moves(self, piece):
-		# make a deep copy of each object here, so we don't update the board or the pieces with our hypothetical
 		# moves
 		mv = piece.get_moves(self)
 		# print piece.get_pos(self), mv
@@ -177,28 +204,7 @@ class Board(object):
 		for m in mv:
 			if not self.is_self_check(piece, m):
 				lm.append(m)
-			# nb = copy.deepcopy(self)
-			# np = copy.deepcopy(piece)
-			# # print np
-			# nb.update_board(np, m)
-		
-			# find your own King's position first
-			# kp = nb.find_king(np.c)
-			# kp = self.find_king(piece.c)
 
-			# now if your King's position appears in the opponent's possible moves, it is self check
-			# opp_moves = []
-			# opp_moves = self.get_opp_moves(piece.c)
-			# print "opp moves: ", opp_moves
-
-			# if piece.n != 'K' and kp not in opp_moves:
-			# 	lm.append(m)
-			# elif np.n == 'K' and m not in opp_moves:
-			# 	lm.append(m)
-
-			# del nb
-			# del np
-			# print piece.n, lm, "opp_moves: ", opp_moves
 		# now append squares for castling, while accounting for positions that are threatened
 		if piece.n == 'K':
 			cur_cas = self.castling()
@@ -524,6 +530,17 @@ class Board(object):
 
 		return fen
 
+
+	def update_pgn(self):
+		if self.am % 2 == 0:
+			self.pgnh = [self.pgnm]
+		else:
+			self.pgnh.append(self.pgnm)
+			self.pgn.append(self.pgnh)
+
+	def print_pgn(self):
+		for v in self.pgn:
+			print str(self.pgn.index(v) + 1) + '. ' + v[0] + ' ' + v[1],
 
 
 class R(object):
