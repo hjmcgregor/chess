@@ -1,5 +1,7 @@
 # python chess
-A Python chess rules engine. Computer moves are determined using the Stockfish chess engine (https://stockfishchess.org/). You must pass the location of your stockfish engine via positional argument (examples below).
+A Python chess rules engine. Computer moves are determined using the Stockfish chess engine (https://stockfishchess.org/), or you can play human vs. human.
+
+You must pass the location of your stockfish engine via positional argument (examples below).
 
 
 ```
@@ -10,14 +12,15 @@ positional arguments:
 
 optional arguments:
   -h, --help  show this help message and exit
-  -bsl BSL    the skill level for Black (0 to 20). Default is 20
   -wsl WSL    the skill level for White (0 to 20). Default is 20
+  -bsl BSL    the skill level for Black (0 to 20). Default is 20
   -w          White user. Default is computer. Include this if you want a
               human to make moves for white.
   -b          Black user. Default is computer. Include this if you want a
               human to make moves for black.
-  -p          Turn on board printing
+  -p          Turn on board printing (defaults is on if one player is human)
   --hints     Turn on hints
+  -pgn        Print the game's PGN at the end
 ```
 
 Examples:

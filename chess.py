@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 from pprint import pprint
 from datetime import datetime
-import copy
-
 
 
 class Board(object):
@@ -119,6 +117,8 @@ class Board(object):
 	def update_board(self, piece, np):
 		# TODO: clean up the en passant logic
 		# TODO: add current game's moves to PGN array
+		cp = piece.get_pos(self)
+
 		self.update_ep(piece, np)
 		self.update_hm(piece, np)
 		self.update_fm(piece, np)
@@ -126,7 +126,7 @@ class Board(object):
 		# finally, update the board positions while accounting for castling
 		if piece.n == 'K' and piece.num_moves == 0:
 			# white kingside castle
-			if piece.get_pos(self) == 'e1' and np == 'g1':
+			if cp == 'e1' and np == 'g1':
 				self.positions[np] = piece
 				self.positions['f1'] = self.positions['h1']
 				self.positions['e1'] = None
@@ -135,7 +135,7 @@ class Board(object):
 				self.positions['f1'].num_moves += 1
 				self.pgnm = 'O-O'
 			# white queenside castle
-			elif piece.get_pos(self) == 'e1' and np == 'c1':
+			elif cp == 'e1' and np == 'c1':
 				self.positions[np] = piece
 				self.positions['d1'] = self.positions['a1']
 				self.positions['e1'] = None
@@ -143,7 +143,7 @@ class Board(object):
 				self.positions['d1'].num_moves += 1
 				self.pgnm = 'O-O-O'
 			# black kingside castle
-			elif piece.get_pos(self) == 'e8' and np == 'g8':
+			elif cp == 'e8' and np == 'g8':
 				self.positions[np] = piece
 				self.positions['f8'] = self.positions['h8']
 				self.positions['e8'] = None
@@ -151,7 +151,7 @@ class Board(object):
 				self.positions['f8'].num_moves += 1
 				self.pgnm = 'O-O'
 			# black queenside castle
-			elif piece.get_pos(self) == 'e8' and np == 'c8':
+			elif cp == 'e8' and np == 'c8':
 				self.positions[np] = piece
 				self.positions['d8'] = self.positions['a8']
 				self.positions['e8'] = None
@@ -163,33 +163,39 @@ class Board(object):
 					self.pgnm = piece.n + 'x' + np
 				else:
 					self.pgnm = piece.n + np
-				self.positions[piece.get_pos(self)] = None
+				self.positions[cp] = None
 				self.positions[np] = piece
 			piece.num_moves += 1
 		# and queen promotion
 		elif piece.n == 'p':
 			if int(np[1]) == 8 or int(np[1]) == 1:
 				if piece.c == 'w':
-					self.positions[piece.get_pos(self)] = None
+					self.positions[cp] = None
 					self.positions[np] = Q('w')
 				elif piece.c == 'b':
-					self.positions[piece.get_pos(self)] = None
+					self.positions[cp] = None
 					self.positions[np] = Q('b')
 				self.pgnm = np + "=Q"
 			else:
 				# update the PGN
 				if self.is_occupied(np):
-					self.pgnm = piece.get_pos(self)[0] + 'x' + np
+					self.pgnm = cp[0] + 'x' + np
 				else:
 					self.pgnm = np	
-				self.positions[piece.get_pos(self)] = None
+				self.positions[cp] = None
 				self.positions[np] = piece
 		else:
 			if self.is_occupied(np):
-				self.pgnm = piece.n + piece.get_pos(self)[0] + 'x' + np
+				if piece.n == 'R' or piece.n == 'N':
+					self.pgnm = piece.n + cp[0] + 'x' + np
+				else:
+					self.pgnm = piece.n + 'x' + np
 			else:
-				self.pgnm = piece.n + piece.get_pos(self)[0] + np
-			self.positions[piece.get_pos(self)] = None
+				if piece.n == 'R' or piece.n == 'N':
+					self.pgnm = piece.n + cp[0] + np
+				else:
+					self.pgnm = piece.n + np
+			self.positions[cp] = None
 			self.positions[np] = piece
 		# self.update_pgn()
 
@@ -531,16 +537,21 @@ class Board(object):
 		return fen
 
 
-	def update_pgn(self):
+	def update_pgn(self, end=False):
 		if self.am % 2 == 0:
 			self.pgnh = [self.pgnm]
+			if end:
+				self.pgn.append(self.pgnh)	
 		else:
 			self.pgnh.append(self.pgnm)
 			self.pgn.append(self.pgnh)
 
+
 	def print_pgn(self):
 		for v in self.pgn:
-			print str(self.pgn.index(v) + 1) + '. ' + v[0] + ' ' + v[1],
+			print str(self.pgn.index(v) + 1) + '. ' + v[0],
+			if len(v) > 1:
+				print ' ' + v[1],
 
 
 class R(object):

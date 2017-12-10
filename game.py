@@ -9,12 +9,13 @@ def main():
 	parser = argparse.ArgumentParser(description='A python Chess rules framework, using the Stockfish chess engine.')
 	parser.add_argument('e', metavar='E', type=str,
                     help='Stockfish Engine location')
-	parser.add_argument('-bsl', default=20, help='the skill level for Black (0 to 20). Default is 20')
 	parser.add_argument('-wsl', default=20, help='the skill level for White (0 to 20). Default is 20')
+	parser.add_argument('-bsl', default=20, help='the skill level for Black (0 to 20). Default is 20')
 	parser.add_argument('-w', action='store_true', help='White user. Default is computer. Include this if you want a human to make moves for white.')
 	parser.add_argument('-b', action='store_true', help='Black user. Default is computer. Include this if you want a human to make moves for black.')
 	parser.add_argument('-p', action='store_true', help='Turn on board printing')
 	parser.add_argument('--hints', action='store_true', help='Turn on hints')
+	parser.add_argument('-pgn', action='store_true', help='Print the game\'s PGN at the end')
 	args = parser.parse_args()
 	board = chess.Board()
 	board.set_standard()
@@ -36,6 +37,7 @@ class Game(object):
 		self.wsl = args.wsl
 		self.white = args.w
 		self.black = args.b
+		self.pgn = args.pgn
 		if self.white or self.black:
 			self.p = True
 		else:
@@ -111,9 +113,10 @@ class Game(object):
 
 
 	def end_game(self, board):
-		board.update_pgn()
+		board.update_pgn(end=True)
 		board.print_board()
-		board.print_pgn()
+		if self.pgn:
+			board.print_pgn()
 		sys.exit()
 
 
