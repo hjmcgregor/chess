@@ -123,7 +123,3 @@ class Game(object):
 if __name__ == "__main__":
 	main()
 
-
-# print board.get_legal_moves(board.positions['e8'])
-
-# print datetime.now() - s
