@@ -20,13 +20,16 @@ def main():
 	board = chess.Board()
 	board.set_standard()
 	game = Game(args)
-	board.print_board()
+	# board.print_board()
 	if game.white:
 		game.get_move(board)
 	else:
-		bm = game.get_bestmove(board.get_fen(), board.turn)
-		game.move(board, bm[:2], bm[2:4])
-		game.get_move(board)
+		try:
+			bm = game.get_bestmove(board.get_fen(), board.turn)
+			game.move(board, bm[:2], bm[2:4])
+			# game.get_move(board)
+		except KeyboardInterrupt:
+			board.print_board()
 
 
 class Game(object):
@@ -43,6 +46,7 @@ class Game(object):
 		else:
 			self.p = args.p
 		self.hints = args.hints
+		self.over = False
 
 
 	def get_move(self, board):
@@ -85,15 +89,19 @@ class Game(object):
 				# is_check method once
 				board.pgnm += '+'
 				# board.update_pgn()
-			if (self.white and board.turn == 'w') or (self.black and board.turn == 'b'):
-				self.get_move(board)
-			else:
-				board.update_pgn()
-				bm = self.get_bestmove(board.get_fen(), board.turn)
-				self.move(board, bm[:2], bm[2:4])
+			if not self.over:
+				if (self.white and board.turn == 'w') or (self.black and board.turn == 'b'):
+					self.get_move(board)
+				else:
+					board.update_pgn()
+					bm = self.get_bestmove(board.get_fen(), board.turn)
+					self.move(board, bm[:2], bm[2:4])
 			# get_move(board)
 		else:
 			print 'illegal move, ' + board.colors[board.turn] + ' to move'
+			print "attempted move: " + cp + " to "  + np
+			print "en passant: " + board.ep
+			board.print_board()
 			self.get_move(board)
 
 
@@ -113,11 +121,13 @@ class Game(object):
 
 
 	def end_game(self, board):
+		self.over = True
+		self.P.kill()
 		board.update_pgn(end=True)
-		board.print_board()
+		# board.print_board()
 		if self.pgn:
 			board.print_pgn()
-		sys.exit()
+		# sys.exit()
 
 
 if __name__ == "__main__":

@@ -118,6 +118,10 @@ class Board(object):
 		# TODO: clean up the en passant logic
 		cp = piece.get_pos(self)
 
+		# assign the en passant square to a temporary variable, since we update self via updated_ep
+		e = self.ep
+
+		# update en passant, half-move, ful-move, and all-move
 		self.update_ep(piece, np)
 		self.update_hm(piece, np)
 		self.update_fm(piece, np)
@@ -165,7 +169,7 @@ class Board(object):
 				self.positions[cp] = None
 				self.positions[np] = piece
 			piece.num_moves += 1
-		# and queen promotion
+		# and queen promotion/en-passant
 		elif piece.n == 'p':
 			if int(np[1]) == 8 or int(np[1]) == 1:
 				if piece.c == 'w':
@@ -175,6 +179,15 @@ class Board(object):
 					self.positions[cp] = None
 					self.positions[np] = Q('b')
 				self.pgnm = np + "=Q"
+			elif np == e:
+				print "en passant: ", self.fm
+				if piece.c == 'w':
+					self.positions[np[0] + str(int(np[1]) - 1)] = None
+				elif piece.c == 'b':
+					self.positions[np[0] + str(int(np[1]) + 1)] = None
+				self.positions[cp] = None
+				self.positions[np] = piece
+				self.pgnm = cp[0] + 'x' + np
 			else:
 				# update the PGN
 				if self.is_occupied(np):
@@ -185,18 +198,19 @@ class Board(object):
 				self.positions[np] = piece
 		else:
 			if self.is_occupied(np):
-				if piece.n == 'R' or piece.n == 'N':
-					self.pgnm = piece.n + cp[0] + 'x' + np
+				if piece.n != 'K' or piece.n != 'p':
+					self.pgnm = piece.n + cp + 'x' + np
 				else:
 					self.pgnm = piece.n + 'x' + np
 			else:
-				if piece.n == 'R' or piece.n == 'N':
-					self.pgnm = piece.n + cp[0] + np
+				if piece.n != 'K' or piece.n != 'p':
+					self.pgnm = piece.n + cp + np
 				else:
 					self.pgnm = piece.n + np
 			self.positions[cp] = None
 			self.positions[np] = piece
-		# self.update_pgn()
+		
+
 
 
 	def get_legal_moves(self, piece):
@@ -373,6 +387,8 @@ class Board(object):
 				elif np[0] == 'h':
 					if self.positions['g4'] is not None and self.positions['g4'].n == 'p' and self.positions['g4'].c == 'b':
 						self.ep = 'h3'
+			else:
+				self.ep = '-'
 		else:
 			self.ep = '-'
 
