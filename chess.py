@@ -180,7 +180,7 @@ class Board(object):
 					self.positions[np] = Q('b')
 				self.pgnm = np + "=Q"
 			elif np == e:
-				print "en passant: ", self.fm
+				# print "en passant: ", self.fm
 				if piece.c == 'w':
 					self.positions[np[0] + str(int(np[1]) - 1)] = None
 				elif piece.c == 'b':
@@ -228,10 +228,10 @@ class Board(object):
 		if piece.n == 'K':
 			cur_cas = self.castling()
 			# squares that cannot be threatened
-			wkt = ['e1', 'f1', 'g1', 'h1']
-			wqt = ['a1', 'b1', 'c1', 'd1', 'e1']
-			bqt = ['a8', 'b8', 'c8', 'd8', 'e8']
-			bkt = ['e8', 'f8', 'g8', 'h8']
+			wkt = ['e1', 'f1', 'g1']
+			wqt = ['c1', 'd1', 'e1']
+			bqt = ['c8', 'd8', 'e8']
+			bkt = ['e8', 'f8', 'g8']
 			opp_moves = self.get_opp_moves(piece.c)
 			if piece.get_pos(self) == 'e1':
 				# white kingside castling
